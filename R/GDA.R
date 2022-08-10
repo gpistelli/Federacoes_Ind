@@ -7,7 +7,7 @@ library(cluster)
 row.names(df) <- paste0(df$Entidade, 1:nrow(df))
 
 df$Maior_n_Func <- gsub(pattern = "10-49 Func", replacement = "20-99 Func", df$Maior_n_Func) %>% 
-  gsub(pattern = "50-199 Func", replacement = "100-199 Func", x = .) %>% gsub(pattern = "Até 9 Func", replacement = "Até 19 Func", x = .)
+  gsub(pattern = "50-199 Func", replacement = "100-199 Func", x = .)
 
 df$Maior_Fat <- gsub("De 30 a 50M Fat|De 50 a 100M Fat", "Mais de 30M Fat", df$Maior_Fat)
 
@@ -15,10 +15,10 @@ df[c("Maior_n_Func", "Maior_Fat", "Entidade")] <- lapply(df[c("Maior_n_Func", "M
 
 dir_MCA_nvK <- MCA(X = df[c(1:4, 17)], quali.sup = 5, graph = F)
 dir_MCA_set <- MCA(X = df[c("Transf", "Infra", "Agr", "Comerc", "Serv", "Extr", "Constr", "Entidade")], quali.sup = 8, graph = F)
-#dir_MCA_all <- MCA(X = df[c("Entidade", "Maior_n_Func", "Maior_Fat", "N_Emp", "KSoc",
-#                            "Transf", "Infra", "Agr", "Comerc", "Serv", "Extr")], quali.sup = 1, graph = F)
+dir_MCA_all <- MCA(X = df[c("Entidade", "Maior_n_Func", "Maior_Fat", "N_Emp", "KSoc",
+                            "Transf", "Infra", "Agr", "Comerc", "Serv", "Extr")], quali.sup = 1, graph = F)
 dir_MCA_reg <- MCA(X = df[c("Entidade", "Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul")], quali.sup = 1, graph = F)
-#dir_MCA_all <- MCA(X = df, quali.sup = 17, graph = F)
+dir_MCA_all <- MCA(X = df, quali.sup = 17, graph = F)
 
 fviz_mca_var(X = dir_MCA_nvK, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
 fviz_mca_var(X = dir_MCA_set, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
@@ -88,8 +88,8 @@ dir_cluster_reg$data.clust |>
   as.data.frame()
 
 chisq.test(table(dir_cluster_nvk$data.clust$clust, dir_cluster_nvk$data.clust$Entidade))
-chisq.test(table(dir_cluster_set$data.clust$clust, dir_cluster_set$data.clust$Entidade))
-chisq.test(table(dir_cluster_reg$data.clust$clust, dir_cluster_reg$data.clust$Entidade))
+chisq.test(table(dir_cluster_set$data.clust$clust, dir_cluster_nvk$data.clust$Entidade))
+chisq.test(table(dir_cluster_reg$data.clust$clust, dir_cluster_nvk$data.clust$Entidade))
 
 # Fazendo com o factoextra
 

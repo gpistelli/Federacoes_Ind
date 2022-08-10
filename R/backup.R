@@ -24,6 +24,5 @@ Sys.sleep(5)
 
 CS_backup_links("FIESC", "21-24")
 CS_backup_links("FIESP", "22-25")
-CS_backup_links("FIEG", "19-22")
 
 ###
