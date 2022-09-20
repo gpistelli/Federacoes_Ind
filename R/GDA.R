@@ -4,98 +4,83 @@ library(FactoMineR)
 library(factoextra)
 library(cluster)
 
-row.names(df) <- paste0(df$Entidade, 1:nrow(df))
-
+# Ajuste das categorias
 df$Maior_n_Func <- gsub(pattern = "10-49 Func", replacement = "20-99 Func", df$Maior_n_Func) %>% 
-  gsub(pattern = "50-199 Func", replacement = "100-199 Func", x = .)
+  gsub(pattern = "50-199 Func", replacement = "100-199 Func", x = .) %>% gsub(pattern = "Até 9 Func", replacement = "Até 19 Func", x = .)
 
-df$Maior_Fat <- gsub("De 30 a 50M Fat|De 50 a 100M Fat", "Mais de 30M Fat", df$Maior_Fat)
+df$Maior_Fat <- gsub("De 30 a 50M Fat|De 50 a 100M Fat|Mais de 100M Fat", "Mais de 30M Fat", df$Maior_Fat)
 
-df[c("Maior_n_Func", "Maior_Fat", "Entidade")] <- lapply(df[c("Maior_n_Func", "Maior_Fat", "Entidade")], as.factor)     
+df[c("Maior_n_Func", "Entidade")] <- lapply(df[c("Maior_n_Func", "Entidade")], as.factor)     
 
+df$Maior_n_Func <- factor(x = df$Maior_n_Func, levels = c("Até 19 Func", "20-99 Func", "100-199 Func", "Mais de 200 Func"))
+df$Maior_Fat <- factor(x = df$Maior_Fat, levels = c("Até 240k Fat", "Até 2,4M Fat", "De 2,4 a 5M Fat", "De 5 a 10M Fat",
+                                                    "De 10 a 30M Fat", "Mais de 30M Fat"))
+
+# Construindo a tabela de distribuição das categorias
+summary_list <- lapply(df[c("N_Emp", "Maior_n_Func", "Maior_Fat", "KSoc", "Transf", "Serv", "Comerc", "Constr", "Agr", "Extr", "Infra")], summary, use.na = T)
+names(summary_list) <- c("N_Emp", "Maior_n_Func", "Maior_Fat", "KSoc", "Transf", "Serv", "Comerc", "Constr", "Agr", "Extr", "Infra")
+
+summary_kable_list <- list()
+for (i in 1:length(summary_list)){
+  summary_kable_list[[i]]  <- kable(summary_list[[i]], col.names = names(summary_list)[i])
+}
+
+# TABELA 1
+kables(summary_kable_list) %>% kable_styling(bootstrap_options = "striped") %>% save_kable("img/Tabela1.html")
+
+
+# Construindo as ACMs
 dir_MCA_nvK <- MCA(X = df[c(1:4, 17)], quali.sup = 5, graph = F)
 dir_MCA_set <- MCA(X = df[c("Transf", "Infra", "Agr", "Comerc", "Serv", "Extr", "Constr", "Entidade")], quali.sup = 8, graph = F)
-dir_MCA_all <- MCA(X = df[c("Entidade", "Maior_n_Func", "Maior_Fat", "N_Emp", "KSoc",
-                            "Transf", "Infra", "Agr", "Comerc", "Serv", "Extr")], quali.sup = 1, graph = F)
-dir_MCA_reg <- MCA(X = df[c("Entidade", "Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul")], quali.sup = 1, graph = F)
-dir_MCA_all <- MCA(X = df, quali.sup = 17, graph = F)
 
-fviz_mca_var(X = dir_MCA_nvK, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
-fviz_mca_var(X = dir_MCA_set, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
-fviz_mca_var(X = dir_MCA_all, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
-fviz_mca_var(X = dir_MCA_reg, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
+# ACM 1
+fviz_mca_var(X = dir_MCA_nvK, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T, 
+             title = "ACM 1: Nível de capital dos membros das federações da indústria selecionadas")
 
-fviz_contrib(X = dir_MCA_nvK, choice = "var", axes = 1, top = 10)
-fviz_contrib(X = dir_MCA_nvK, choice = "var", axes = 2, top = 10)
-fviz_contrib(X = dir_MCA_nvK, choice = "var", axes = 3, top = 10)
+# ACM 2
+fviz_mca_var(X = dir_MCA_set, axes = c(1, 2), col.var = "contrib", repel = T,  gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             title = "ACM 2: Atuação setorial dos membros das federações da indústria selecionadas")
 
-fviz_mca_var(X = dir_MCA_nvK, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
-fviz_mca_var(X = dir_MCA_set, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
-fviz_mca_var(X = dir_MCA_all, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
-fviz_mca_var(X = dir_MCA_reg, axes = c(1, 2), col.var = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = T)
 
-fviz_mca_ind(X = dir_MCA_nvK, repel = T, habillage = "Entidade", addEllipses = T)
-fviz_mca_ind(X = dir_MCA_set, repel = T, habillage = "Entidade", addEllipses = T)
-fviz_mca_ind(X = dir_MCA_all, repel = T, habillage = "Entidade", addEllipses = T)
+# Construindo os clusteres
+dir_cluster_nvk <- HCPC(res = dir_MCA_nvK, nb.clust = -1, graph = F, description = T, iter.max = 10000)
 
-fviz_contrib(X = dir_MCA_all, choice = "var", axes = 1, top = 10)
-fviz_contrib(X = dir_MCA_all, choice = "var", axes = 2, top = 10)
-fviz_contrib(X = dir_MCA_all, choice = "var", axes = 3, top = 10)
-fviz_contrib(X = dir_MCA_all, choice = "var", axes = 4, top = 10)
+# Salvando tabelas de descrição dos clusteres
+for (i in 1:5){
+dir_cluster_nvk$desc.var$category[[as.character(i)]] %>% 
+  knitr::kable(x = ., digits = 2, caption = paste0("Principais categorias do cluster ", i), fileencoding = "utf8") %>%
+  kable_styling(bootstrap_options = "striped") %>% 
+  save_kable(file = paste0("img/clust", i, ".html"))
+}
 
-dir_cluster_nvk <- HCPC(res = dir_MCA_nvK, nb.clust = -1, graph = F, description = T)
-dir_cluster_set <- HCPC(res = dir_MCA_set, nb.clust = -1, graph = F, description = T)
-dir_cluster_reg <- HCPC(res = dir_MCA_reg, nb.clust = -1, graph = F, description = T)
+# Análise da distribuição de clusteres por entidades
 
-FactoMineR::plot.HCPC(x = dir_cluster_nvk, choice = "map", draw.tree = F)
-FactoMineR::plot.HCPC(x = dir_cluster_set, choice = "map", draw.tree = F)
-FactoMineR::plot.HCPC(x = dir_cluster_reg, choice = "map", draw.tree = F)
-
-fviz_cluster(object = dir_cluster_reg,
-             data = dir_cluster_reg$data.clust,
-             repel = T)
-
-dir_cluster_nvk$desc.var
-dir_cluster_set$desc.var
-dir_cluster_reg$desc.var
-
-# nvk_coord <- cut(x = as.data.frame(dir_MCA_nvK$ind$coord)$`Dim 1`, 
-#                 breaks = c(-4444, cut_nvk, 55555), 
-#                 labels = c("A", "B", "C", "D"))
-
-# df_nvk <- cbind(df[c(1:4, 17)], nvk_coord)
-
-# ggplot(data = df_nvk) %>% 
-
-dir_cluster_nvk$data.clust |> 
+table_freq_clust_nvk <- dir_cluster_nvk$data.clust |> 
   group_by(Entidade) |> 
   count(clust) |> 
   mutate(freq = n / sum(n)) |> 
   as.data.frame()
 
-dir_cluster_set$desc.var
+# GRÁFICO 1
+ggplot(data = table_freq_clust_nvk) +
+  aes(fill = clust, y = freq, x = Entidade) + 
+  geom_bar(position="stack", stat="identity")
 
-dir_cluster_set$data.clust |> 
-  group_by(Entidade) |> 
-  count(clust) |> 
-  mutate(freq = n / sum(n)) |> 
-  as.data.frame()
+# Construindo o gráfico da distribuição de atuação setorial por cluster econômico
 
-dir_cluster_reg$data.clust |> 
-  group_by(Entidade) |> 
-  count(clust) |> 
-  mutate(freq = n / sum(n)) |> 
-  as.data.frame()
+df$clust_nvk <- dir_cluster_nvk$data.clust$clust
 
-chisq.test(table(dir_cluster_nvk$data.clust$clust, dir_cluster_nvk$data.clust$Entidade))
-chisq.test(table(dir_cluster_set$data.clust$clust, dir_cluster_nvk$data.clust$Entidade))
-chisq.test(table(dir_cluster_reg$data.clust$clust, dir_cluster_nvk$data.clust$Entidade))
+Clust_Transf <- ggplot(data = df) +
+  geom_bar(mapping = aes(x = clust_nvk, fill = Transf), position = "fill")
 
-# Fazendo com o factoextra
+Clust_Agr <- ggplot(data = df) +
+  geom_bar(mapping = aes(x = clust_nvk, fill = Agr), position = "fill")
 
-fviz_cluster(object = dir_cluster_nvk, axes = c(1, 2), data = dir_cluster_nvk$data.clust,
-             repel = T, 
-             ggtheme = theme_minimal()
-)
+Clust_Serv <- ggplot(data = df) +
+  geom_bar(mapping = aes(x = clust_nvk, fill = Serv), position = "fill")
 
-dir_cluster_set$desc.var
+Clust_Comerc <- ggplot(data = df) +
+  geom_bar(mapping = aes(x = clust_nvk, fill = Comerc), position = "fill")
+
+# GRÁFICO 2
+grid.arrange(Clust_Agr, Clust_Comerc, Clust_Serv, Clust_Transf, nrow = 2)

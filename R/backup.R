@@ -18,11 +18,15 @@ download.file(url = a[i],
                                  Sys.Date(),
                                  ".html")
               )
-Sys.sleep(5)
+
+print(paste0(i, " of ", length(a), " (", (i/length(a))*100, "%) completed!"))  
+Sys.sleep(2)
 }
 }
 
+CS_backup_links("FIEC", "19-24")
 CS_backup_links("FIESC", "21-24")
 CS_backup_links("FIESP", "22-25")
-
-###
+CS_backup_links("FIEG", "19-22")
+CS_backup_links("FIEAM", "19-23")
+CS_backup_links("CNI", "18-22")
