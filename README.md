@@ -9,4 +9,4 @@ Realizamos este trabalho com a ajuda do pacote [Consultasocio](https://github.co
 
 # Artigos
 
-(FERREIRA, Gabriel P. P. Mapeando a composição econômica do empresariado: proposição de um método espacial. 46º ANPOCS, 2022, S7 07 Ciências Sociais Computacionais)[https://www.encontro2022.anpocs.com/atividade/view?q=YToyOntzOjY6InBhcmFtcyI7czozNjoiYToxOntzOjEyOiJJRF9BVElWSURBREUiO3M6MzoiMTM0Ijt9IjtzOjE6ImgiO3M6MzI6ImE1NDM1YjRjYzcyZmMyMDNkMjk2ODhiNDI2NzRlNTJlIjt9&ID_ATIVIDADE=134]
+[FERREIRA, Gabriel P. P. Mapeando a composição econômica do empresariado: proposição de um método espacial. 46º ANPOCS, 2022, S7 07 Ciências Sociais Computacionais](https://www.encontro2022.anpocs.com/atividade/view?q=YToyOntzOjY6InBhcmFtcyI7czozNjoiYToxOntzOjEyOiJJRF9BVElWSURBREUiO3M6MzoiMTM0Ijt9IjtzOjE6ImgiO3M6MzI6ImE1NDM1YjRjYzcyZmMyMDNkMjk2ODhiNDI2NzRlNTJlIjt9&ID_ATIVIDADE=134)
